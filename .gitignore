@@ -1,0 +1,8 @@
+specs/*
+
+.nodex/
+.tmp_*/
+nodex
+nodex.exe
+*.test
+*.out

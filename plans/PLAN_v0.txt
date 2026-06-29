@@ -1,0 +1,52 @@
+PLAN_v0 - Nodex one-shot implementation
+
+Summary
+- Build a single Go CLI binary `nodex` with local file storage in `.nodex/`.
+- Implement branch metadata management, deterministic merge preparation, manual-first merge apply, and MCP stdio tools.
+- Keep dependencies to Go standard library only.
+
+Locked decisions
+- CLI parsing: stdlib `flag`.
+- Transcript extraction: strict local parse, fail merge prep if unavailable.
+- Apply flow: manual handoff by default; mark applied only with explicit flags.
+- No separate `mark-applied` command.
+
+Commands
+- nodex init [--force]
+- nodex status
+- nodex branches
+- nodex branch <name> [--from <branch>]
+- nodex switch <name>
+- nodex chat [branch]
+- nodex merge <src> --into <dest> --mode <summary|decision|verbose> [--message "..."] [--last N] [--prepare]
+- nodex apply <merge-id> [--echo-only] [--mark-applied] [--yes]
+- nodex show <branch>
+- nodex mcp serve
+
+Storage model
+- .nodex/workspace.json
+- .nodex/current_branch
+- .nodex/branches/<name>.json
+- .nodex/merges/merge-####.json
+- .nodex/cache/transcript-<branch>.json
+
+Core internals
+- workspace: init/load/save/root discovery/current branch sync
+- branch: validate/load/save/list/create/switch
+- codex adapter: detect/resume/start/fork(unsupported in v1)
+- transcript: strict extractor + turn normalization
+- merge: prepare/save/load/next-id/apply-mark
+- preview: summary/decision/verbose deterministic templates
+- redact: regex + entropy + optional denylist warnings
+- mcp: initialize/tools/list/tools/call over stdio JSON-RPC
+
+Testing
+- Unit tests: branch name validation, preview rendering, turn selection, merge ID generation.
+- Manual smoke flow in README.
+
+Acceptance criteria
+- All commands implemented and wired.
+- `.nodex` schemas persisted as JSON.
+- Merge artifacts generated with deterministic preview text.
+- MCP exposes six tools with JSON payloads.
+- README and MIT license included.
